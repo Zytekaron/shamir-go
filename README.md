@@ -21,10 +21,6 @@ Non-considerations:
   run this on should already be trusted (since it contains plaintext
   secrets), so side-channel attacks should be essentially a non-factor.
 
-# Compatible Libraries
-
-- **TypeScript & JavaScript:** [Zytekaron/squad-js](https://github.com/Zytekaron/squad-js) (npm: `@zytekaron/squad`)
-
 # Usage
 
 ## Command-line
@@ -64,7 +60,11 @@ squad combine "squad/share_"* -o recovered.txt
 ## Go library
 
 This project also serves as a Go library which can be used
-in your own projects.
+in your own projects to split and combine `[]byte` secrets.
+
+# Compatible Libraries
+
+- **TypeScript & JavaScript:** [Zytekaron/shamir-js](https://github.com/Zytekaron/shamir-js) (npm: `@zytekaron/shamir`)
 
 # License
 **squad** is licensed under the [MIT License](./LICENSE).
