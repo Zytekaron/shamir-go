@@ -1,4 +1,4 @@
-package squad_test
+package shamir
 
 import (
 	"encoding/hex"
@@ -7,8 +7,6 @@ import (
 	"math/rand/v2"
 	"slices"
 	"testing"
-
-	"github.com/zytekaron/squad"
 )
 
 var testRng = rand.NewChaCha8([32]byte{})
@@ -19,7 +17,7 @@ func TestSmall(t *testing.T) {
 	const k = 3
 
 	secret := []byte("Hello there, combiner of my tests.")
-	shares, err := squad.Split(secret, n, k)
+	shares, err := Split(secret, n, k)
 	if err != nil {
 		t.Fatal("error splitting:", err)
 	}
@@ -28,7 +26,7 @@ func TestSmall(t *testing.T) {
 	delete(shares, 2)
 	delete(shares, 5)
 
-	result := squad.Combine(shares)
+	result := Combine(shares)
 	if !slices.Equal(result, secret) {
 		t.Fatal("combined result does not match secret")
 	}
@@ -42,7 +40,7 @@ func TestLarge(t *testing.T) {
 	secret := make([]byte, 8192)
 	testRng.Read(secret)
 
-	shares, err := squad.Split(secret, n, k)
+	shares, err := Split(secret, n, k)
 	if err != nil {
 		t.Fatal("error splitting:", err)
 	}
@@ -54,7 +52,7 @@ func TestLarge(t *testing.T) {
 	delete(shares, 67)
 	delete(shares, 97)
 
-	result := squad.Combine(shares)
+	result := Combine(shares)
 	if !slices.Equal(result, secret) {
 		t.Fatal("combined result does not match secret")
 	}
@@ -66,7 +64,7 @@ func TestFail(t *testing.T) {
 	const k = 3
 
 	secret := []byte("Hello there, combiner of my tests.")
-	shares, err := squad.Split(secret, n, k)
+	shares, err := Split(secret, n, k)
 	if err != nil {
 		t.Fatal("error splitting:", err)
 	}
@@ -76,7 +74,7 @@ func TestFail(t *testing.T) {
 	delete(shares, 4)
 	delete(shares, 5)
 
-	result := squad.Combine(shares)
+	result := Combine(shares)
 	if slices.Equal(result, secret) {
 		t.Fatal("combined result should not match secret")
 	}
@@ -95,7 +93,7 @@ func TestIntegrity(t *testing.T) {
 	for i := 0; i < 1_000; i++ {
 		testRng.Read(secret)
 
-		shares, err := squad.Split(secret, n, k)
+		shares, err := Split(secret, n, k)
 		if err != nil {
 			t.Fatal("error splitting:", err)
 		}
@@ -105,7 +103,7 @@ func TestIntegrity(t *testing.T) {
 		delete(shares, 5)
 		delete(shares, 8)
 
-		result := squad.Combine(shares)
+		result := Combine(shares)
 		if !slices.Equal(result, secret) {
 			t.Fatal("combined result does not match secret")
 		}
@@ -117,7 +115,7 @@ func ExampleSplit() {
 	const k = 3
 	secret := []byte("Hello World!")
 
-	shares, err := squad.Split(secret, n, k)
+	shares, err := Split(secret, n, k)
 	if err != nil {
 		log.Fatalln("error splitting secret:", err)
 	}
@@ -135,6 +133,6 @@ func ExampleCombine() {
 		5: {0xCA, 0xA7, 0x2C, 0xFC, 0x33, 0x58, 0x8E, 0x15, 0x05, 0xA0, 0xFB, 0x5B},
 	}
 
-	result := squad.Combine(shares)
+	result := Combine(shares)
 	fmt.Println(string(result)) // Hello, World!
 }

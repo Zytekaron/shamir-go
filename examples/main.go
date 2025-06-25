@@ -15,7 +15,7 @@ func main() {
 
 	// split your secret into n shares, where at least
 	// k of them are required to recover the secret
-	shares, err := squad.Split(secret, n, k)
+	shares, err := Split(secret, n, k)
 	if err != nil {
 		log.Fatalln("error splitting secret:", err)
 	}

@@ -8,7 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zytekaron/squad"
+	"github.com/zytekaron/galois-go"
+	"github.com/zytekaron/shamir-go"
 )
 
 var fs = NewFlagSet()
@@ -69,7 +70,7 @@ func split(args []string) error {
 		return fmt.Errorf("error parsing threshold: %w", err)
 	}
 	// if either poly or gen is set, attempt to parse both.
-	field := squad.ShamirGaloisField
+	field := shamir.GaloisField
 	if fs.ParsedArgs["poly"] != "" || fs.ParsedArgs["gen"] != "" {
 		poly, err := strconv.ParseInt(fs.ParsedArgs["poly"], 0, 64)
 		if err != nil {
@@ -79,7 +80,7 @@ func split(args []string) error {
 		if err != nil {
 			return fmt.Errorf("error parsing generator: %w", err)
 		}
-		field = squad.New256(uint16(poly), byte(gen))
+		field = galois.New256(uint16(poly), byte(gen))
 	}
 
 	// read in the secret
@@ -117,12 +118,12 @@ func split(args []string) error {
 
 	var shares map[byte][]byte
 	if fs.ParsedArgs["tagged"] == "" {
-		shares, err = squad.SplitWithField(field, secret, byte(k), byte(n))
+		shares, err = shamir.SplitWithField(field, secret, byte(k), byte(n))
 		if err != nil {
 			return fmt.Errorf("error splitting secret: %w", err)
 		}
 	} else {
-		shares, err = squad.SplitTaggedWithField(field, secret, byte(k), byte(n))
+		shares, err = shamir.SplitTaggedWithField(field, secret, byte(k), byte(n))
 		if err != nil {
 			return fmt.Errorf("error splitting secret: %w", err)
 		}
@@ -162,7 +163,7 @@ func split(args []string) error {
 
 func combine(args []string) error {
 	// if either poly or gen is set, attempt to parse both.
-	field := squad.ShamirGaloisField
+	field := shamir.GaloisField
 	if fs.ParsedArgs["poly"] != "" || fs.ParsedArgs["gen"] != "" {
 		poly, err := strconv.ParseInt(fs.ParsedArgs["poly"], 0, 64)
 		if err != nil {
@@ -172,7 +173,7 @@ func combine(args []string) error {
 		if err != nil {
 			return fmt.Errorf("error parsing generator: %w", err)
 		}
-		field = squad.New256(uint16(poly), byte(gen))
+		field = galois.New256(uint16(poly), byte(gen))
 	}
 
 	var output io.Writer
@@ -204,10 +205,10 @@ func combine(args []string) error {
 
 	var combined []byte
 	if fs.ParsedArgs["tagged"] == "" {
-		combined = squad.CombineWithField(field, secrets)
+		combined = shamir.CombineWithField(field, secrets)
 	} else {
 		var err error
-		combined, err = squad.CombineTaggedWithField(field, secrets)
+		combined, err = shamir.CombineTaggedWithField(field, secrets)
 		if err != nil {
 			return fmt.Errorf("error combining secrets, tag mismatch: %w", err)
 		}

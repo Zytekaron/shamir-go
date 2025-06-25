@@ -1,7 +1,9 @@
-package squad
+package shamir
 
 import (
 	"errors"
+
+	"github.com/zytekaron/galois-go"
 )
 
 // Combine takes the available shares and attempts
@@ -11,10 +13,10 @@ import (
 // for this operation to succeed, otherwise it will
 // silently fail by returning garbage output.
 func Combine(shares map[byte][]byte) []byte {
-	return CombineWithField(ShamirGaloisField, shares)
+	return CombineWithField(GaloisField, shares)
 }
 
-func CombineWithField(gf *GF256, shares map[byte][]byte) []byte {
+func CombineWithField(gf *galois.GF256, shares map[byte][]byte) []byte {
 	var secretLength int
 	for _, share := range shares {
 		secretLength = len(share)
@@ -25,12 +27,12 @@ func CombineWithField(gf *GF256, shares map[byte][]byte) []byte {
 	}
 
 	// unlock secret
-	samples := make([]Point, len(shares))
+	samples := make([]galois.Point, len(shares))
 	secret := make([]byte, secretLength)
 	for i := 0; i < secretLength; i++ {
 		sampleIndex := 0
 		for x := range shares {
-			samples[sampleIndex] = Point{x: x, y: shares[x][i]}
+			samples[sampleIndex] = galois.Point{X: x, Y: shares[x][i]}
 			sampleIndex++
 		}
 
@@ -48,10 +50,10 @@ func CombineWithField(gf *GF256, shares map[byte][]byte) []byte {
 // produce an error due to a tag mismatch caused by
 // the underlying algorithm producing garbage output.
 func CombineTagged(shares map[byte][]byte) ([]byte, error) {
-	return CombineTaggedWithField(ShamirGaloisField, shares)
+	return CombineTaggedWithField(GaloisField, shares)
 }
 
-func CombineTaggedWithField(gf *GF256, shares map[byte][]byte) ([]byte, error) {
+func CombineTaggedWithField(gf *galois.GF256, shares map[byte][]byte) ([]byte, error) {
 	var secretLength int
 	for _, share := range shares {
 		secretLength = len(share) - TagLength
@@ -61,13 +63,13 @@ func CombineTaggedWithField(gf *GF256, shares map[byte][]byte) ([]byte, error) {
 		return nil, nil
 	}
 
-	samples := make([]Point, len(shares))
+	samples := make([]galois.Point, len(shares))
 
 	// verify tag
 	for i := 0; i < TagLength; i++ {
 		sampleIndex := 0
 		for x := range shares {
-			samples[sampleIndex] = Point{x: x, y: shares[x][i]}
+			samples[sampleIndex] = galois.Point{X: x, Y: shares[x][i]}
 			sampleIndex++
 		}
 
@@ -81,7 +83,7 @@ func CombineTaggedWithField(gf *GF256, shares map[byte][]byte) ([]byte, error) {
 	for i := 0; i < secretLength; i++ {
 		sampleIndex := 0
 		for x := range shares {
-			samples[sampleIndex] = Point{x: x, y: shares[x][i+TagLength]}
+			samples[sampleIndex] = galois.Point{X: x, Y: shares[x][i+TagLength]}
 			sampleIndex++
 		}
 

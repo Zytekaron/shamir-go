@@ -1,4 +1,4 @@
-package squad
+package shamir
 
 type Share struct {
 	X      byte

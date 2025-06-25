@@ -1,4 +1,4 @@
-package squad
+package shamir
 
 import (
 	"fmt"

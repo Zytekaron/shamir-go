@@ -1,16 +1,18 @@
-package squad
+package shamir
 
 import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+
+	"github.com/zytekaron/galois-go"
 )
 
-// ShamirGaloisField is a GF(2^8) field which uses the standard
-// AES polynomial and generators, PolyAES (0x11B) and GenAES (0x03).
+// GaloisField is a GF(2^8) field which uses the standard AES
+// polynomial and generators, Poly256AES (0x11B) and Gen256AES (0x03).
 //
 // This is the default Galois Field used for Shamir Secret Sharing.
-var ShamirGaloisField = New256(PolyAES, GenAES)
+var GaloisField = galois.New256(galois.Poly256AES, galois.Gen256AES)
 
 // Split takes the secret and splits it into n shares,
 // where at least k are required to recreate the secret.
@@ -36,10 +38,10 @@ var ShamirGaloisField = New256(PolyAES, GenAES)
 //
 // Reference: https://en.wikipedia.org/wiki/Shamir's_secret_sharing
 func Split(secret []byte, k, n byte) (map[byte][]byte, error) {
-	return SplitWithField(ShamirGaloisField, secret, k, n)
+	return SplitWithField(GaloisField, secret, k, n)
 }
 
-func SplitWithField(gf *GF256, secret []byte, k, n byte) (map[byte][]byte, error) {
+func SplitWithField(gf *galois.GF256, secret []byte, k, n byte) (map[byte][]byte, error) {
 	if gf == nil {
 		return nil, errors.New("galois field is nil")
 	}
@@ -76,10 +78,10 @@ func SplitWithField(gf *GF256, secret []byte, k, n byte) (map[byte][]byte, error
 }
 
 func SplitTagged(secret []byte, k, n byte) (map[byte][]byte, error) {
-	return SplitTaggedWithField(ShamirGaloisField, secret, k, n)
+	return SplitTaggedWithField(GaloisField, secret, k, n)
 }
 
-func SplitTaggedWithField(gf *GF256, secret []byte, k, n byte) (map[byte][]byte, error) {
+func SplitTaggedWithField(gf *galois.GF256, secret []byte, k, n byte) (map[byte][]byte, error) {
 	if gf == nil {
 		return nil, errors.New("galois field is nil")
 	}
